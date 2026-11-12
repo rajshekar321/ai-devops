@@ -1,0 +1,90 @@
+name: Continuous Integration (CI)
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-lint:
+    name: Run Python Tests & Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+
+      - name: Code Linting & Syntax Check
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 app tests --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Run custom static syntax check script
+          python scripts/run_tests.py
+
+      - name: Run Pytest Suite
+        run: |
+          pytest -v tests/ --junitxml=pytest-results.xml
+
+  docker-validation:
+    name: Validate Docker & Compose Builds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose config --quiet
+
+      - name: Build Docker Container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ai-devops-app:latest
+
+  terraform-validation:
+    name: Terraform Lint & Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+
+      - name: Terraform Format Check
+        run: |
+          terraform -chdir=terraform fmt -check
+
+      - name: Terraform Init (Backend Mock)
+        run: |
+          terraform -chdir=terraform init -backend=false
+
+      - name: Terraform Validate
+        run: |
+          terraform -chdir=terraform validate

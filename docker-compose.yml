@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aidevops-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=AI-DevOps Control Plane
+      - APP_ENV=production
+      - DATABASE_URL=postgresql+psycopg2://devops_user:devops_password@db:5432/aidevops_db
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - devops-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  db:
+    image: postgres:16-alpine
+    container_name: aidevops-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=aidevops_db
+      - POSTGRES_USER=devops_user
+      - POSTGRES_PASSWORD=devops_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - devops-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops_user -d aidevops_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  devops-network:
+    driver: bridge

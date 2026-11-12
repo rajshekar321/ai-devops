@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-DevOps Control Center</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo-area">
+                <div class="logo-icon">🚀</div>
+                <div>
+                    <h1>AI-DevOps Control Center</h1>
+                    <p class="subtitle">Autonomous Cloud Pipeline & Application Dashboard</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="system-badge" class="badge badge-success">
+                    <span class="pulse-dot"></span> Checking Status...
+                </span>
+                <a href="/docs" target="_blank" class="btn btn-outline">API Docs (Swagger)</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <!-- System Health Grid -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">API Status</div>
+                <div id="api-status-val" class="metric-value">Checking...</div>
+                <div class="metric-sub">FastAPI Runtime</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Database Health</div>
+                <div id="db-status-val" class="metric-value">Checking...</div>
+                <div class="metric-sub">PostgreSQL / Storage Engine</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Environment</div>
+                <div id="env-val" class="metric-value">Production</div>
+                <div class="metric-sub">Target: AWS EC2</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Deployment Engine</div>
+                <div class="metric-value text-accent">GitHub Actions</div>
+                <div class="metric-sub">Terraform + Docker</div>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <div class="workspace-grid">
+            <!-- DevOps Task Management -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>DevOps Pipeline Tasks</h2>
+                    <button id="refresh-tasks-btn" class="btn btn-sm btn-outline">Refresh</button>
+                </div>
+
+                <form id="task-form" class="task-form">
+                    <div class="form-group">
+                        <input type="text" id="task-title" placeholder="Task title (e.g., Run security scan)" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" id="task-desc" placeholder="Brief description (optional)">
+                        <select id="task-priority">
+                            <option value="medium">Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                            <option value="high">High Priority</option>
+                            <option value="critical">Critical Priority</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Add Task</button>
+                    </div>
+                </form>
+
+                <div class="task-list-wrapper">
+                    <table class="table" id="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-tbody">
+                            <tr><td colspan="5" class="text-center">Loading tasks...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Deployment Log Feed -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Recent Deployments</h2>
+                    <span class="badge badge-info">Automated CD</span>
+                </div>
+                <div id="deployments-list" class="deployments-feed">
+                    <div class="deploy-item">
+                        <div class="deploy-meta">
+                            <span class="badge badge-success">Initial Release</span>
+                            <span class="deploy-time">v1.0.0</span>
+                        </div>
+                        <p class="deploy-desc">FastAPI containerized service with Docker, Terraform & GitHub Actions CI/CD.</p>
+                        <div class="deploy-footer">Target: AWS EC2 &bull; Managed by AI-DevOps Agent</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer container">
+        <p>AI-DevOps Autonomous Platform &bull; Designed for Zero-Downtime Deployment &bull; AWS EC2</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

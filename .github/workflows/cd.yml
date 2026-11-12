@@ -1,0 +1,77 @@
+name: Continuous Deployment (CD) - AWS EC2
+
+on:
+  push:
+    branches: ["main"]
+
+# Required permissions for GitHub Actions OIDC Authentication
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-to-ec2:
+    name: Deploy Container to AWS EC2 via SSM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via Secure IAM OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: GitHubActions-EC2-Deploy
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Deploy Application to EC2 via AWS Systems Manager (SSM)
+        id: ssm-deploy
+        run: |
+          INSTANCE_ID="${{ secrets.EC2_INSTANCE_ID }}"
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "::notice ::EC2_INSTANCE_ID secret is not set yet. Skipping live EC2 deployment command."
+            exit 0
+          fi
+
+          echo "Initiating zero-SSH container deployment via AWS Systems Manager..."
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands='[
+              "mkdir -p /opt/aidevops",
+              "cd /opt/aidevops",
+              "docker compose pull || true",
+              "docker compose up -d --remove-orphans",
+              "docker system prune -f"
+            ]' \
+            --output text \
+            --query "Command.CommandId")
+
+          echo "Command dispatched with ID: $COMMAND_ID. Awaiting execution..."
+          aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID"
+          echo "Deployment command completed successfully on EC2 instance."
+
+      - name: Verify Application Health
+        run: |
+          APP_HOST="${{ secrets.APP_HOST }}"
+          if [ -z "$APP_HOST" ]; then
+            echo "::notice ::APP_HOST secret not configured. Skipping external health check."
+            exit 0
+          fi
+
+          echo "Pinging health endpoint at http://${APP_HOST}:8000/api/v1/ping..."
+          for i in {1..6}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${APP_HOST}:8000/api/v1/ping" || true)
+            if [ "$STATUS" -eq 200 ]; then
+              echo "Health check succeeded with HTTP 200 OK!"
+              exit 0
+            fi
+            echo "Waiting for service to boot... attempt $i/6 (status: $STATUS)"
+            sleep 5
+          done
+          echo "Service failed to respond with HTTP 200 in expected window."
+          exit 1

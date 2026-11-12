@@ -1,0 +1,34 @@
+# Git
+.git/
+.gitignore
+
+# Virtual environments & cache
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local configuration & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+
+# IaC & CI/CD
+terraform/
+.github/
+docs/
+scripts/
+
+# OS and IDE files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
