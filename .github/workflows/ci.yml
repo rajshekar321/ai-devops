@@ -2,9 +2,10 @@ name: Continuous Integration (CI)
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main", "**"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
