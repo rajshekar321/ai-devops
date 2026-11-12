@@ -25,7 +25,7 @@ variable "instance_type" {
 variable "github_repo" {
   description = "GitHub repository formatted as owner/repo (e.g., octocat/my-app) for OIDC trust"
   type        = string
-  default     = "my-org/my-ai-devops"
+  default     = "rajshekar321/ai-devops"
 }
 
 variable "app_port" {

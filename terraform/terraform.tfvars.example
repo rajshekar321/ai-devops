@@ -5,5 +5,5 @@ aws_region   = "us-east-1"
 environment  = "production"
 project_name = "ai-devops"
 instance_type = "t3.micro"
-github_repo  = "your-username-or-org/your-repo-name"
+github_repo  = "rajshekar321/ai-devops"
 app_port     = 8000

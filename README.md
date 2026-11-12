@@ -1,6 +1,6 @@
 # AI-DevOps: Autonomous Cloud Application & Pipeline
 
-[![CI](https://github.com/your-org/ai-devops/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/ai-devops/actions/workflows/ci.yml)
+[![CI](https://github.com/rajshekar321/ai-devops/actions/workflows/ci.yml/badge.svg)](https://github.com/rajshekar321/ai-devops/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
